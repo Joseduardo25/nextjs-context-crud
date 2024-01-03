@@ -36,9 +36,17 @@ const TasksProvider = ({children}) => {
       id: uuid()
     }])
   }
+  const deleteTask = (id) =>{
+    setTasks([...tasks.filter((task)=> task.id !== id)])
+  }
+
   return (
     <TaskContext.Provider
-      value={{tasks, createTask}}
+      value={{
+        tasks,
+        createTask,
+        deleteTask
+      }}
     >
       {children}
     </TaskContext.Provider>
