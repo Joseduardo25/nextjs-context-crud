@@ -1,22 +1,41 @@
 "use client"
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTask } from '@/context/TasksContext'
 
-const page = () => {
+const page = ({params}) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = useRouter()
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [task, setTask] = useState()
+  const [task, setTask] = useState({
+    title: "",
+    description: ""
+  })
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { createTask } = useTask()
+  const { tasks, createTask, updateTask } = useTask()
   const handleChange = (e) => setTask({...task,[e.target.name]: e.target.value})
   const handleSubmit = (e) =>{
     e.preventDefault()
-    console.log(task)
-    createTask(task.title, task.description)
+    if(params.id){
+      console.log("EDITANDO")
+      console.log(params.id, task)
+      updateTask(params.id, task)
+    }else{
+      createTask(task.title, task.description)
+    }
     router.push('/')
   }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(()=>{
+    if(params){
+      const taskFound = tasks.find( task => task.id === params.id)
+      if (taskFound) setTask({
+        title: taskFound.title,
+        description: taskFound.description
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
   return (
     <div className='h-screen flex items-center'>
       <form 
@@ -28,12 +47,14 @@ const page = () => {
           placeholder='Escribe el Titulo'
           className='text-3xl font-semibold rounded-lg'
           onChange={handleChange}
+          value={task.title}
         />
         <textarea 
           name='description'
           placeholder='Escribe la descripcion'
           className='mt-4 rounded-lg'
           onChange={handleChange}
+          value={task.description}
           />
         <div className='flex gap-8'>
           <button 
